@@ -18,7 +18,6 @@ public class Product {
     }
 
     public Product( String code, String description, BigDecimal price, Currency currency, int stock, String imageUrl) {
-        //this.id = -1L;
         this.code = code;
         this.description = description;
         this.price = price;

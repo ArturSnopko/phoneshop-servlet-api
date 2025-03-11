@@ -8,14 +8,13 @@ import java.util.concurrent.locks.ReentrantReadWriteLock;
 
 
 public class ArrayListProductDao implements ProductDao {
-    private List<Product> productList;
+    private final List<Product> productList;
     private long currentId;
     private final ReentrantReadWriteLock lock = new ReentrantReadWriteLock();
 
     public ArrayListProductDao() {
         productList = new ArrayList<>();
         currentId = 1L;
-        //saveSampleProducts();
     }
 
     @Override
@@ -25,7 +24,7 @@ public class ArrayListProductDao implements ProductDao {
             return productList.stream()
                     .filter(product -> id.equals(product.getId()))
                     .findAny()
-                    .orElseThrow(ProductNotFoundException::new);
+                    .orElseThrow(() -> new ProductNotFoundException("Product with id = " + id + " wasn't found"));
         } finally {
             lock.readLock().unlock();
         }
@@ -39,8 +38,7 @@ public class ArrayListProductDao implements ProductDao {
                     .filter(product -> product.getStock() > 0)
                     .filter(product -> product.getPrice() != null)
                     .toList();
-        } finally
-        {
+        } finally {
             lock.readLock().unlock();
         }
     }
@@ -70,7 +68,7 @@ public class ArrayListProductDao implements ProductDao {
         lock.writeLock().lock();
         try {
             if (!productList.removeIf(product -> id.equals(product.getId()))){
-                throw new ProductNotFoundException();
+                throw new ProductNotFoundException("Product with id = " + id + " wasn't found");
             }
         } finally {
             lock.writeLock().unlock();

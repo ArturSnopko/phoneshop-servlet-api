@@ -18,7 +18,7 @@ public class ArrayListProductDaoTest
     }
 
     @Test
-    public void testFindProducts() throws ProductNotFoundException {
+    public void testFindProducts() {
         assertTrue(productDao.findProducts().isEmpty());
         Product product = new Product("some-test-product1", "Samsung Galaxy S", new BigDecimal(100), usd, 100, "https://raw.githubusercontent.com/andrewosipenko/phoneshop-ext-images/master/manufacturer/Samsung/Samsung%20Galaxy%20S.jpg");
         productDao.save(product);
@@ -26,7 +26,7 @@ public class ArrayListProductDaoTest
     }
 
     @Test
-    public void testFindProductsWithZeroStockLevel() throws ProductNotFoundException {
+    public void testFindProductsWithZeroStockLevel(){
         assertTrue(productDao.findProducts().isEmpty());
         Product product = new Product("some-test-product1", "Samsung Galaxy S", new BigDecimal(100), usd, 0, "https://raw.githubusercontent.com/andrewosipenko/phoneshop-ext-images/master/manufacturer/Samsung/Samsung%20Galaxy%20S.jpg");
         productDao.save(product);
@@ -34,7 +34,7 @@ public class ArrayListProductDaoTest
     }
 
     @Test
-    public void testFindProductsWithNullPrice() throws ProductNotFoundException {
+    public void testFindProductsWithNullPrice(){
         assertTrue(productDao.findProducts().isEmpty());
         Product product = new Product("some-test-product1", "Samsung Galaxy S", new BigDecimal(0), usd, 0, "https://raw.githubusercontent.com/andrewosipenko/phoneshop-ext-images/master/manufacturer/Samsung/Samsung%20Galaxy%20S.jpg");
         productDao.save(product);
