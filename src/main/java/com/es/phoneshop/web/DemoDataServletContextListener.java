@@ -1,18 +1,21 @@
 package com.es.phoneshop.web;
 
 import com.es.phoneshop.model.product.ArrayListProductDao;
+import com.es.phoneshop.model.product.PriceHistory;
 import com.es.phoneshop.model.product.Product;
 import com.es.phoneshop.model.product.ProductDao;
 import jakarta.servlet.ServletContextEvent;
 import jakarta.servlet.ServletContextListener;
 
 import java.math.BigDecimal;
+import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.Currency;
 import java.util.List;
+import java.util.Random;
 
 public class DemoDataServletContextListener implements ServletContextListener {
-    private ProductDao productDao;
+    private final ProductDao productDao;
 
     public DemoDataServletContextListener() {
         productDao = ArrayListProductDao.getInstance();
@@ -24,14 +27,26 @@ public class DemoDataServletContextListener implements ServletContextListener {
         if (insertDemoData)
             for (Product product: getSampleProducts()){
                 productDao.save(product);
+                setSampleHistory(product);
             }
     }
 
     @Override
-    public void contextDestroyed(ServletContextEvent sce) {
+    public void contextDestroyed(ServletContextEvent sce) {}
 
+    public void setSampleHistory(Product product) {
+        List <PriceHistory> history = new ArrayList<>();
+        Random random = new Random();
+        BigDecimal price = product.getPrice();
+
+        for (int i = 0; i < 5; i++) {
+            LocalDate date = LocalDate.now().minusDays(random.nextInt(365) + (5 - i) * 365);
+            BigDecimal newPrice = price.multiply(BigDecimal.valueOf(0.8 + (random.nextDouble() * 0.4)));
+            history.add(new PriceHistory(date, newPrice));
+        }
+        history.add(new PriceHistory(LocalDate.now(), price));
+        product.setHistoryList(history);
     }
-
 
     public List<Product> getSampleProducts(){
         List<Product> products = new ArrayList<>();

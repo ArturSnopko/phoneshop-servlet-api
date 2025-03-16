@@ -6,9 +6,7 @@ import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
-
 import java.io.IOException;
-import java.util.Optional;
 
 public class ProductDetailsPageServlet extends HttpServlet {
     private ProductDao productDao;
@@ -21,7 +19,8 @@ public class ProductDetailsPageServlet extends HttpServlet {
 
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-        String productId = request.getPathInfo().substring(1);
+        String productId = request.getPathInfo();
+        productId = null == productId ? "1" : productId.substring(1);
         request.setAttribute("product", productDao.getProduct(Long.valueOf(productId)));
         request.getRequestDispatcher("/WEB-INF/pages/product.jsp").forward(request, response);
     }

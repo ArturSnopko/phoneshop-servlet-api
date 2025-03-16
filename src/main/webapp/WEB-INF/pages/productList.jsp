@@ -3,6 +3,8 @@
 <%@ taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt" %>
 <%@ taglib prefix="tags" tagdir="/WEB-INF/tags" %>
 
+<link rel="stylesheet" href="${pageContext.request.contextPath}/styles/priceHistory.css">
+
 <jsp:useBean id="products" type="java.util.List" scope="request"/>
 <tags:master pageTitle="Product List">
   <p>
@@ -40,10 +42,32 @@
             ${product.description}
           </a>
         </td>
-        <td class="price">
-          <fmt:formatNumber value="${product.price}" type="currency" currencySymbol="${product.currency.symbol}"/>
+        <td class="price-container">
+          <span class="price">
+            <fmt:formatNumber value="${product.price}" type="currency" currencySymbol="${product.currency.symbol}"/>
+          </span>
+          <div class="modal">
+            <h2>Price History for ${product.description}</h2>
+            <table>
+              <thead>
+              <tr>
+                <th>Date</th>
+                <th>Price</th>
+              </tr>
+              </thead>
+              <tbody>
+              <c:forEach var="history" items="${product.historyList}">
+                <tr>
+                  <td>${history.date}</td>
+                  <td><fmt:formatNumber value="${history.price}" type="currency" currencySymbol="${product.currency.symbol}"/></td>
+                </tr>
+              </c:forEach>
+              </tbody>
+            </table>
+          </div>
         </td>
       </tr>
     </c:forEach>
   </table>
+
 </tags:master>
