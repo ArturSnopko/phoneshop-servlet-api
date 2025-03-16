@@ -12,14 +12,15 @@ public class ArrayListProductDaoTest
 {
     private ProductDao productDao;
     Currency usd = Currency.getInstance("USD");
+
     @Before
     public void setup() {
-        productDao = new ArrayListProductDao();
+        productDao = ArrayListProductDao.getInstance();
+        ((ArrayListProductDao)productDao).clear();
     }
 
     @Test
     public void testFindProducts() {
-        assertTrue(productDao.findProducts("", null, null).isEmpty());
         Product product = new Product("some-test-product1", "Samsung Galaxy S", new BigDecimal(100), usd, 100, "https://raw.githubusercontent.com/andrewosipenko/phoneshop-ext-images/master/manufacturer/Samsung/Samsung%20Galaxy%20S.jpg");
         productDao.save(product);
         assertFalse(productDao.findProducts("", null, null).isEmpty());
@@ -27,7 +28,6 @@ public class ArrayListProductDaoTest
 
     @Test
     public void testFindProductsWithZeroStockLevel(){
-        assertTrue(productDao.findProducts("", null, null).isEmpty());
         Product product = new Product("some-test-product1", "Samsung Galaxy S", new BigDecimal(100), usd, 0, "https://raw.githubusercontent.com/andrewosipenko/phoneshop-ext-images/master/manufacturer/Samsung/Samsung%20Galaxy%20S.jpg");
         productDao.save(product);
         assertTrue(productDao.findProducts("", null, null).isEmpty());
@@ -35,10 +35,9 @@ public class ArrayListProductDaoTest
 
     @Test
     public void testFindProductsWithNullPrice(){
-        assertTrue(productDao.findProducts("", null, null).isEmpty());
-        Product product = new Product("some-test-product1", "Samsung Galaxy S", new BigDecimal(0), usd, 0, "https://raw.githubusercontent.com/andrewosipenko/phoneshop-ext-images/master/manufacturer/Samsung/Samsung%20Galaxy%20S.jpg");
-        productDao.save(product);
-        assertTrue(productDao.findProducts("", null, null).isEmpty());
+       Product product = new Product("some-test-product1", "Samsung Galaxy S", new BigDecimal(0), usd, 0, "https://raw.githubusercontent.com/andrewosipenko/phoneshop-ext-images/master/manufacturer/Samsung/Samsung%20Galaxy%20S.jpg");
+       productDao.save(product);
+       assertTrue(productDao.findProducts("", null, null).isEmpty());
     }
 
     @Test (expected = ProductNotFoundException.class)

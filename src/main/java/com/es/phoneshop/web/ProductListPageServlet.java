@@ -2,6 +2,7 @@ package com.es.phoneshop.web;
 
 import com.es.phoneshop.model.product.ArrayListProductDao;
 
+import com.es.phoneshop.model.product.ProductDao;
 import com.es.phoneshop.model.product.SortField;
 import com.es.phoneshop.model.product.SortOrder;
 import jakarta.servlet.ServletConfig;
@@ -13,13 +14,12 @@ import java.io.IOException;
 import java.util.Optional;
 
 public class ProductListPageServlet extends HttpServlet {
-    private ArrayListProductDao productDao;
+    private ProductDao productDao;
 
     @Override
     public void init(ServletConfig config) throws ServletException {
         super.init(config);
-        productDao = new ArrayListProductDao();
-        productDao.saveSampleProducts();
+        productDao = ArrayListProductDao.getInstance();
     }
 
     @Override
