@@ -33,7 +33,7 @@ public class ArrayListProductDao implements ProductDao {
             return productList.stream()
                     .filter(product -> id.equals(product.getId()))
                     .findAny()
-                    .orElseThrow(() -> new ProductNotFoundException("Product with id = " + id + " wasn't found"));
+                    .orElseThrow(() -> new ProductNotFoundException("Product with id = " + id + " wasn't found", id));
         } finally {
             lock.readLock().unlock();
         }
@@ -98,7 +98,7 @@ public class ArrayListProductDao implements ProductDao {
         lock.writeLock().lock();
         try {
             if (!productList.removeIf(product -> id.equals(product.getId()))){
-                throw new ProductNotFoundException("Product with id = " + id + " wasn't found");
+                throw new ProductNotFoundException("Product with id = " + id + " wasn't found", id);
             }
         } finally {
             lock.writeLock().unlock();
