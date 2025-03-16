@@ -2,8 +2,10 @@ package com.es.phoneshop.model.product;
 
 import java.math.BigDecimal;
 import java.util.ArrayList;
-import java.util.Currency;
+import java.util.Arrays;
+import java.util.Comparator;
 import java.util.List;
+import java.util.Currency;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
 
 
@@ -31,12 +33,20 @@ public class ArrayListProductDao implements ProductDao {
     }
 
     @Override
-    public List<Product> findProducts() {
+    public List<Product> findProducts(String query) {
         lock.readLock().lock();
         try {
+
+            List<String> splitQuery = (query == null || query.isEmpty())
+                    ? List.of()
+                    : Arrays.asList(query.split("\\s+"));
+
             return productList.stream()
+                    .filter(product -> splitQuery.isEmpty() || splitQuery.stream().anyMatch(part -> product.getDescription().contains(part)))
                     .filter(product -> product.getStock() > 0)
                     .filter(product -> product.getPrice() != null)
+                    .sorted(Comparator.comparingInt((Product product) ->
+                            (int)splitQuery.stream().filter(part -> product.getDescription().contains(part)).count()).reversed())
                     .toList();
         } finally {
             lock.readLock().unlock();

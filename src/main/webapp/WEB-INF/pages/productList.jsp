@@ -8,6 +8,12 @@
   <p>
     Welcome to Expert-Soft training!
   </p>
+  <form>
+    <label>
+      <input name = "query" value = "${param.query}">
+      <button>Search</button>
+    </label>
+  </form>
   <table>
     <thead>
       <tr>

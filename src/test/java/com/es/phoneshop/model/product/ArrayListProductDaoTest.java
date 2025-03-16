@@ -19,26 +19,26 @@ public class ArrayListProductDaoTest
 
     @Test
     public void testFindProducts() {
-        assertTrue(productDao.findProducts().isEmpty());
+        assertTrue(productDao.findProducts("").isEmpty());
         Product product = new Product("some-test-product1", "Samsung Galaxy S", new BigDecimal(100), usd, 100, "https://raw.githubusercontent.com/andrewosipenko/phoneshop-ext-images/master/manufacturer/Samsung/Samsung%20Galaxy%20S.jpg");
         productDao.save(product);
-        assertFalse(productDao.findProducts().isEmpty());
+        assertFalse(productDao.findProducts("").isEmpty());
     }
 
     @Test
     public void testFindProductsWithZeroStockLevel(){
-        assertTrue(productDao.findProducts().isEmpty());
+        assertTrue(productDao.findProducts("").isEmpty());
         Product product = new Product("some-test-product1", "Samsung Galaxy S", new BigDecimal(100), usd, 0, "https://raw.githubusercontent.com/andrewosipenko/phoneshop-ext-images/master/manufacturer/Samsung/Samsung%20Galaxy%20S.jpg");
         productDao.save(product);
-        assertTrue(productDao.findProducts().isEmpty());
+        assertTrue(productDao.findProducts("").isEmpty());
     }
 
     @Test
     public void testFindProductsWithNullPrice(){
-        assertTrue(productDao.findProducts().isEmpty());
+        assertTrue(productDao.findProducts("").isEmpty());
         Product product = new Product("some-test-product1", "Samsung Galaxy S", new BigDecimal(0), usd, 0, "https://raw.githubusercontent.com/andrewosipenko/phoneshop-ext-images/master/manufacturer/Samsung/Samsung%20Galaxy%20S.jpg");
         productDao.save(product);
-        assertTrue(productDao.findProducts().isEmpty());
+        assertTrue(productDao.findProducts("").isEmpty());
     }
 
     @Test (expected = ProductNotFoundException.class)
@@ -78,12 +78,12 @@ public class ArrayListProductDaoTest
 
     @Test
     public void testDeleteProduct() throws ProductNotFoundException {
-        assertTrue(productDao.findProducts().isEmpty());
+        assertTrue(productDao.findProducts("").isEmpty());
         Product product = new Product("some-test-product1", "Samsung Galaxy S", new BigDecimal(100), usd, 100, "https://raw.githubusercontent.com/andrewosipenko/phoneshop-ext-images/master/manufacturer/Samsung/Samsung%20Galaxy%20S.jpg");
         productDao.save(product);
-        assertFalse(productDao.findProducts().isEmpty());
+        assertFalse(productDao.findProducts("").isEmpty());
         productDao.delete(product.getId());
-        assertTrue(productDao.findProducts().isEmpty());
+        assertTrue(productDao.findProducts("").isEmpty());
     }
 
 }
