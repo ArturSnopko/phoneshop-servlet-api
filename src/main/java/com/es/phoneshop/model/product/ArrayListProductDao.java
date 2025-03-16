@@ -33,9 +33,16 @@ public class ArrayListProductDao implements ProductDao {
     }
 
     @Override
-    public List<Product> findProducts(String query) {
+    public List<Product> findProducts(String query, SortField sortField, SortOrder sortOrder) {
         lock.readLock().lock();
         try {
+            Comparator <Product> comparator = Comparator.comparing((Product product)-> {
+                if (SortField.description == sortField) {
+                    return (Comparable) product.getDescription();
+                } else {
+                    return (Comparable) product.getPrice();
+                }
+            });
 
             List<String> splitQuery = (query == null || query.isEmpty())
                     ? List.of()
@@ -45,8 +52,14 @@ public class ArrayListProductDao implements ProductDao {
                     .filter(product -> splitQuery.isEmpty() || splitQuery.stream().anyMatch(part -> product.getDescription().contains(part)))
                     .filter(product -> product.getStock() > 0)
                     .filter(product -> product.getPrice() != null)
-                    .sorted(Comparator.comparingInt((Product product) ->
-                            (int)splitQuery.stream().filter(part -> product.getDescription().contains(part)).count()).reversed())
+                    .sorted(( (sortField == null) ?
+                            Comparator.comparingInt((Product product) ->
+                            (int) splitQuery.stream().filter(part -> product.getDescription().contains(part)).count()).reversed()
+                            : (sortOrder == SortOrder.desc ? comparator.reversed() : comparator)
+                            .thenComparing(Comparator.comparingInt((Product product) ->
+                            (int) splitQuery.stream().filter(part -> product.getDescription().contains(part)).count()).reversed())
+                    ))
+
                     .toList();
         } finally {
             lock.readLock().unlock();
