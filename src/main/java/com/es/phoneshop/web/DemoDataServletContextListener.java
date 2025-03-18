@@ -1,6 +1,6 @@
 package com.es.phoneshop.web;
 
-import com.es.phoneshop.model.product.ArrayListProductDao;
+import com.es.phoneshop.model.product.MapProductDao;
 import com.es.phoneshop.model.product.PriceHistory;
 import com.es.phoneshop.model.product.Product;
 import com.es.phoneshop.model.product.ProductDao;
@@ -13,17 +13,21 @@ import java.util.ArrayList;
 import java.util.Currency;
 import java.util.List;
 import java.util.Random;
+import java.util.concurrent.ThreadLocalRandom;
 
 public class DemoDataServletContextListener implements ServletContextListener {
     private final ProductDao productDao;
+    private static final String INSERT_DEMO_DATA = "insertDemoData";
+    private static final int SAMPLE_HISTORY_SIZE = 5;
 
     public DemoDataServletContextListener() {
-        productDao = ArrayListProductDao.getInstance();
+        productDao = MapProductDao.getInstance();
     }
 
     @Override
     public void contextInitialized(ServletContextEvent sce) {
-        boolean insertDemoData = Boolean.parseBoolean(sce.getServletContext().getInitParameter("insertDemoData"));
+        boolean insertDemoData = Boolean.parseBoolean(sce.getServletContext().getInitParameter(INSERT_DEMO_DATA));
+
         if (insertDemoData)
             for (Product product: getSampleProducts()){
                 productDao.save(product);
@@ -35,15 +39,20 @@ public class DemoDataServletContextListener implements ServletContextListener {
     public void contextDestroyed(ServletContextEvent sce) {}
 
     public void setSampleHistory(Product product) {
+        if (product.getHistoryList() != null && !product.getHistoryList().isEmpty()) {
+            return;
+        }
+
         List <PriceHistory> history = new ArrayList<>();
-        Random random = new Random();
+        ThreadLocalRandom random = ThreadLocalRandom.current();
         BigDecimal price = product.getPrice();
 
-        for (int i = 0; i < 5; i++) {
-            LocalDate date = LocalDate.now().minusDays(random.nextInt(365) + (5 - i) * 365);
+        for (int i = 0; i < SAMPLE_HISTORY_SIZE; i++) {
+            LocalDate date = LocalDate.now().minusDays(random.nextInt(365) + (SAMPLE_HISTORY_SIZE - i) * 365);
             BigDecimal newPrice = price.multiply(BigDecimal.valueOf(0.8 + (random.nextDouble() * 0.4)));
             history.add(new PriceHistory(date, newPrice));
         }
+
         history.add(new PriceHistory(LocalDate.now(), price));
         product.setHistoryList(history);
     }

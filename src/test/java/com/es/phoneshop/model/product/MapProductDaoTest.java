@@ -8,15 +8,15 @@ import java.util.Currency;
 
 import static org.junit.Assert.*;
 
-public class ArrayListProductDaoTest
+public class MapProductDaoTest
 {
     private ProductDao productDao;
     Currency usd = Currency.getInstance("USD");
 
     @Before
     public void setup() {
-        productDao = ArrayListProductDao.getInstance();
-        ((ArrayListProductDao)productDao).clear();
+        productDao = MapProductDao.getInstance();
+        ((MapProductDao)productDao).clear();
     }
 
     @Test
