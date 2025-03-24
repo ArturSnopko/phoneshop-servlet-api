@@ -1,9 +1,9 @@
 package com.es.phoneshop.web;
 
-import com.es.phoneshop.model.product.MapProductDao;
+import com.es.phoneshop.dao.MapProductDao;
 import com.es.phoneshop.model.product.PriceHistory;
 import com.es.phoneshop.model.product.Product;
-import com.es.phoneshop.model.product.ProductDao;
+import com.es.phoneshop.dao.ProductDao;
 import jakarta.servlet.ServletContextEvent;
 import jakarta.servlet.ServletContextListener;
 
@@ -12,7 +12,6 @@ import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.Currency;
 import java.util.List;
-import java.util.Random;
 import java.util.concurrent.ThreadLocalRandom;
 
 public class DemoDataServletContextListener implements ServletContextListener {

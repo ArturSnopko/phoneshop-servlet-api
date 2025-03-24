@@ -1,8 +1,13 @@
 package com.es.phoneshop.web;
 
-import jakarta.servlet.*;
+import jakarta.servlet.ServletException;
+import jakarta.servlet.RequestDispatcher;
+import jakarta.servlet.ServletConfig;
+import jakarta.servlet.ServletContext;
+import jakarta.servlet.ServletContextEvent;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import jakarta.servlet.http.HttpSession;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -10,10 +15,15 @@ import org.mockito.Mock;
 import org.mockito.junit.MockitoJUnitRunner;
 
 import java.io.IOException;
+import java.util.Locale;
 
-import static org.mockito.ArgumentMatchers.*;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.mock;
+
 
 @RunWith(MockitoJUnitRunner.class)
 public class ProductDetailsPageServletTest {
@@ -47,5 +57,39 @@ public class ProductDetailsPageServletTest {
         verify(requestDispatcher).forward(request, response);
         verify(request).setAttribute(eq("product"), any());
         verify(request).getPathInfo();
+    }
+
+    @Test
+    public void testDoPostWithoutErrors() throws ServletException, IOException {
+        when(request.getParameter("quantity")).thenReturn("1");
+        when(request.getLocale()).thenReturn(new Locale("en"));
+        HttpSession mockSession = mock(HttpSession.class);
+        when(request.getSession()).thenReturn(mockSession);
+        servlet.doPost(request, response);
+        verify(request).getParameter(eq("quantity"));
+        verify(response).sendRedirect(any());
+    }
+
+    @Test
+    public void testDoPostWithNotANumberError() throws ServletException, IOException {
+        when(request.getParameter("quantity")).thenReturn("asd");
+        when(request.getLocale()).thenReturn(new Locale("en"));
+        HttpSession mockSession = mock(HttpSession.class);
+        when(request.getSession()).thenReturn(mockSession);
+
+        servlet.doPost(request, response);
+        verify(request).setAttribute(eq("error"), any());
+
+    }
+    @Test
+    public void testDoPostWithOutOfStockError() throws ServletException, IOException {
+        when(request.getParameter("quantity")).thenReturn("99999");
+        when(request.getLocale()).thenReturn(new Locale("en"));
+        HttpSession mockSession = mock(HttpSession.class);
+        when(request.getSession()).thenReturn(mockSession);
+
+        servlet.doPost(request, response);
+        verify(request).setAttribute(eq("error"), any());
+
     }
 }

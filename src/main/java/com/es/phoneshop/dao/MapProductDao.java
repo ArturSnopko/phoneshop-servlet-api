@@ -1,5 +1,9 @@
-package com.es.phoneshop.model.product;
+package com.es.phoneshop.dao;
 
+import com.es.phoneshop.enums.SortField;
+import com.es.phoneshop.enums.SortOrder;
+import com.es.phoneshop.exceptions.ProductNotFoundException;
+import com.es.phoneshop.model.product.Product;
 import org.eclipse.jetty.util.StringUtil;
 
 import java.util.Arrays;
@@ -113,9 +117,9 @@ public class MapProductDao implements ProductDao {
     }
 
     private boolean filter (List<String> splitQuery, Product product){
-        boolean res = (splitQuery.isEmpty() ||
-               splitQuery.stream().anyMatch(part -> product.getDescription().contains(part) &&
-               product.getStock() > 0 && product.getPrice() != null));
+        boolean res = ((splitQuery.isEmpty() ||
+               splitQuery.stream().anyMatch(part -> product.getDescription().contains(part))) &&
+               product.getStock() > 0 && product.getPrice() != null);
         return res;
     }
 }
