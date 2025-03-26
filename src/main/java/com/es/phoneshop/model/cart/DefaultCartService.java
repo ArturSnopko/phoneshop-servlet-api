@@ -9,17 +9,12 @@ import jakarta.servlet.http.HttpServletRequest;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
 
 public class DefaultCartService implements CartService {
-    private static volatile CartService instance;
+    private static class Holder {
+        private static final DefaultCartService INSTANCE = new DefaultCartService();
+    }
 
-    public static CartService getInstance() {
-        if (instance == null) {
-            synchronized (ProductDao.class) {
-                if (instance == null) {
-                    instance = new DefaultCartService();
-                }
-            }
-        }
-        return instance;
+    public static DefaultCartService getInstance() {
+        return Holder.INSTANCE;
     }
 
     private DefaultCartService() {
@@ -29,7 +24,7 @@ public class DefaultCartService implements CartService {
     private static final String CART_SESSION_ATTRIBUTE = DefaultCartService.class.getName() + ".cart";
 
     private final ReentrantReadWriteLock lock = new ReentrantReadWriteLock();
-    private ProductDao productDao;
+    private final ProductDao productDao;
 
     @Override
     public Cart getCart(HttpServletRequest request) {

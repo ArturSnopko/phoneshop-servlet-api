@@ -5,7 +5,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class Cart implements Serializable {
-    private List<CartItem> items;
+    private final List<CartItem> items;
 
     public Cart() {
         items = new ArrayList<CartItem>();

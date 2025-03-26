@@ -11,30 +11,29 @@ import java.util.Comparator;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.List;
+import java.util.concurrent.atomic.AtomicLong;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
 
 
 public class MapProductDao implements ProductDao {
     private static volatile ProductDao instance;
 
-    public static ProductDao getInstance() {
-        if (instance == null) {
-            synchronized (ProductDao.class) {
-                if (instance == null) {
-                    instance = new MapProductDao();
-                }
-            }
-        }
-        return instance;
+    private static class Holder {
+        private static final MapProductDao INSTANCE = new MapProductDao();
     }
 
+    public static MapProductDao getInstance() {
+        return Holder.INSTANCE;
+    }
+
+
     private final Map<Long, Product> productMap;
-    private long currentId;
+    private final AtomicLong currentId;
     private final ReentrantReadWriteLock lock = new ReentrantReadWriteLock();
 
     private MapProductDao() {
         productMap = new HashMap<Long, Product>();
-        currentId = 1L;
+        currentId =  new AtomicLong(1);
     }
 
     @Override
@@ -86,7 +85,7 @@ public class MapProductDao implements ProductDao {
         lock.writeLock().lock();
         try{
             if (product.getId() == null) {
-                product.setId(currentId++);
+                product.setId(currentId.getAndAdd(1));
             }
             productMap.put(product.getId(), product);
         } finally {
@@ -117,9 +116,8 @@ public class MapProductDao implements ProductDao {
     }
 
     private boolean filter (List<String> splitQuery, Product product){
-        boolean res = ((splitQuery.isEmpty() ||
+        return ((splitQuery.isEmpty() ||
                splitQuery.stream().anyMatch(part -> product.getDescription().contains(part))) &&
                product.getStock() > 0 && product.getPrice() != null);
-        return res;
     }
 }
