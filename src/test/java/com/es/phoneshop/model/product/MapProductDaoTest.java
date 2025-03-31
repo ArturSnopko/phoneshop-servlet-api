@@ -8,8 +8,15 @@ import org.junit.Test;
 
 import java.math.BigDecimal;
 import java.util.Currency;
+import java.util.concurrent.CountDownLatch;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertEquals;
+
 
 public class MapProductDaoTest
 {
@@ -86,6 +93,28 @@ public class MapProductDaoTest
         assertFalse(productDao.findProducts("", null, null).isEmpty());
         productDao.delete(product.getId());
         assertTrue(productDao.findProducts("", null, null).isEmpty());
+    }
+
+    @Test
+    public void testConcurrent() throws InterruptedException {
+        int threadCount = 5;
+        CountDownLatch latch = new CountDownLatch(threadCount);
+        ExecutorService executorService = Executors.newFixedThreadPool(threadCount);
+
+        for (int i = 0; i < threadCount; i++) {
+            executorService.execute(() -> {
+                try {
+                    Product product = new Product("some-test-product", "Samsung Galaxy S", new BigDecimal(100), usd, 100, "https://raw.githubusercontent.com/andrewosipenko/phoneshop-ext-images/master/manufacturer/Samsung/Samsung%20Galaxy%20S.jpg");
+                    productDao.save(product);
+                } finally {
+                    latch.countDown();
+                }
+            });
+        }
+        latch.await();
+        executorService.shutdown();
+
+        assertEquals(productDao.findProducts("", null, null).size(), threadCount);
     }
 
 }

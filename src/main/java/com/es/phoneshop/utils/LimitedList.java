@@ -1,4 +1,5 @@
 package com.es.phoneshop.utils;
+
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
@@ -26,6 +27,11 @@ public class LimitedList <T> implements Serializable {
         }
         items.add(item);
     }
+
+    public boolean removeItem(T item) {
+        return items.remove(item);
+    }
+
     @Override
     public String toString() {
         return items.toString();

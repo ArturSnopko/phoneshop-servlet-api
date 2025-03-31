@@ -16,8 +16,6 @@ import java.util.concurrent.locks.ReentrantReadWriteLock;
 
 
 public class MapProductDao implements ProductDao {
-    private static volatile ProductDao instance;
-
     private static class Holder {
         private static final MapProductDao INSTANCE = new MapProductDao();
     }
@@ -25,7 +23,6 @@ public class MapProductDao implements ProductDao {
     public static MapProductDao getInstance() {
         return Holder.INSTANCE;
     }
-
 
     private final Map<Long, Product> productMap;
     private final AtomicLong currentId;
@@ -110,6 +107,7 @@ public class MapProductDao implements ProductDao {
         lock.writeLock().lock();
         try {
             productMap.clear();
+            currentId.set(1);
         } finally {
             lock.writeLock().unlock();
         }
