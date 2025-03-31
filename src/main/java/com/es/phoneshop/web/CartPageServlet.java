@@ -20,6 +20,9 @@ public class CartPageServlet extends HttpServlet {
     private CartService cartService;
     private static final String CART = "cart";
     private static final String ERRORS = "errors";
+    private static final String PRODUCT_IDS = "productId";
+    private static final String QUANTITIES = "quantity";
+
 
     @Override
     public void init(ServletConfig config) throws ServletException {
@@ -35,8 +38,8 @@ public class CartPageServlet extends HttpServlet {
 
     @Override
     protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-        String[] productIds = request.getParameterValues("productId");
-        String[] quantities = request.getParameterValues("quantity");
+        String[] productIds = request.getParameterValues(PRODUCT_IDS);
+        String[] quantities = request.getParameterValues(QUANTITIES);
 
         Map<Long, String> errors = new HashMap<>();
         for (int i = 0; i < productIds.length; i++) {

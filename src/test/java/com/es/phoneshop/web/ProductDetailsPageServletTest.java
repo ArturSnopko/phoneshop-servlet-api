@@ -43,7 +43,7 @@ public class ProductDetailsPageServletTest {
         servlet.init(servletConfig);
         when(request.getRequestDispatcher(anyString())).thenReturn(requestDispatcher);
         when(servletConfig.getServletContext()).thenReturn(servletContext);
-        when(servletContext.getInitParameter("insertDemoData")).thenReturn("true"); // Симуляция параметра
+        when(servletContext.getInitParameter("insertDemoData")).thenReturn("true");
 
         DemoDataServletContextListener listener = new DemoDataServletContextListener();
         ServletContextEvent event = new ServletContextEvent(servletContext);
@@ -53,6 +53,8 @@ public class ProductDetailsPageServletTest {
     @Test
     public void testDoGet() throws ServletException, IOException {
         when(request.getPathInfo()).thenReturn("/1");
+        HttpSession mockSession = mock(HttpSession.class);
+        when(request.getSession()).thenReturn(mockSession);
         servlet.doGet(request, response);
         verify(requestDispatcher).forward(request, response);
         verify(request).setAttribute(eq("product"), any());
