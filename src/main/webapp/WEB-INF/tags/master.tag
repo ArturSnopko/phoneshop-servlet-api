@@ -20,10 +20,9 @@
   </main>
   <p> Recently viewed</p>
   <c:if test="${not empty sessionScope.recentlyVisited}">
-    <c:set var="recentlyVisitedList" value="${sessionScope.recentlyVisited.items.reversed()}" />
+    <c:set var="recentlyVisitedList" value="${sessionScope.recentlyVisited.items}" />
     <tr>
       <c:forEach var="pr" items="${recentlyVisitedList}">
-        ${pr}
         <td>
             <img src="${pr.imageUrl}">
             <p>
