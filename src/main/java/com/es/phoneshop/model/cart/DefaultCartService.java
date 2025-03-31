@@ -97,4 +97,10 @@ public class DefaultCartService implements CartService {
             lock.writeLock().unlock();
         }
     }
+
+    @Override
+    public void delete(Cart cart, Long productId) {
+        cart.getItems().removeIf(item -> productId.equals(item.getProduct().getId()));
+    }
+
 }
