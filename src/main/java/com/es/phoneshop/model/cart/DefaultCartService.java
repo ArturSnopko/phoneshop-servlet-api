@@ -6,8 +6,10 @@ import com.es.phoneshop.exceptions.OutOfStockException;
 import com.es.phoneshop.model.product.Product;
 import jakarta.servlet.http.HttpServletRequest;
 
+import java.math.BigDecimal;
 import java.util.Optional;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
+import java.util.stream.Collectors;
 
 public class DefaultCartService implements CartService {
     private static class Holder {
@@ -69,6 +71,8 @@ public class DefaultCartService implements CartService {
             } else {
                 currentItem.setQuantity(overallQuantity);
             }
+
+            recalculateCart(cart);
         } finally {
             lock.writeLock().unlock();
         }
@@ -93,14 +97,35 @@ public class DefaultCartService implements CartService {
             } else {
                 currentItem.setQuantity(quantity);
             }
+
+            recalculateCart(cart);
+        } finally {
+            lock.writeLock().unlock();
+        }
+
+    }
+
+    @Override
+    public void delete(Cart cart, Long productId) {
+        lock.writeLock().lock();
+        try {
+            cart.getItems().removeIf(item -> productId.equals(item.getProduct().getId()));
+            recalculateCart(cart);
         } finally {
             lock.writeLock().unlock();
         }
     }
 
-    @Override
-    public void delete(Cart cart, Long productId) {
-        cart.getItems().removeIf(item -> productId.equals(item.getProduct().getId()));
+    private void recalculateCart(Cart cart) {
+        cart.setTotalQuantity(cart.getItems().stream()
+                .map(CartItem::getQuantity)
+                .mapToInt(q -> q.intValue())
+                .sum());
+        cart.setTotalCost(cart.getItems().stream()
+                .map(item -> item.getProduct().
+                        getPrice().
+                        multiply(BigDecimal.valueOf(item.getQuantity())))
+                .reduce(BigDecimal.ZERO, BigDecimal::add)
+        );
     }
-
 }
