@@ -7,11 +7,20 @@
 
 <jsp:useBean id="products" type="java.util.List" scope="request"/>
 <tags:master pageTitle="Product List">
-  <iframe name="hidden-frame" style="display: none;"></iframe>
-
   <p>
     Welcome to Expert-Soft training!
   </p>
+  <c:if test="${not empty param.message}">
+    <div class="success">
+        ${param.message}
+    </div>
+  </c:if>
+
+  <c:if test="${not empty errors}">
+    <div class="error">
+      There were errors
+    </div>
+  </c:if>
   <form>
     <label>
       <input name = "query" value = "${param.query}">
@@ -27,7 +36,7 @@
           <tags:sortLink sort="description" order="asc" text="▲"/>
           <tags:sortLink sort="description" order="desc" text="▼"/>
         </td>
-        <td>
+        <td  class="quantity">
           Quantity
         </td>
         <td class="price">
@@ -40,7 +49,7 @@
       </tr>
     </thead>
     <c:forEach var="product" items="${products}">
-      <form method="post" action="${pageContext.servletContext.contextPath}/products/${product.id}" target="hidden-frame">
+      <form method="post" action="${pageContext.servletContext.contextPath}/products">
         <tr>
           <td>
             <img class="product-tile" src="${product.imageUrl}">
@@ -51,8 +60,15 @@
             </a>
           </td>
           <td class="quantity">
+            <c:set var="error" value="${errors[product.id]}"/>
             <input type="hidden" name="productId" value="${product.id}">
-            <input type="number" name="quantity" min="1" value="1">
+            <input type="number" name="quantity" min="1" value="1"  class="quantity">
+            <c:if  test="${not empty error}">
+              <div class="error">
+                  ${error}
+              </div>
+            </c:if>
+
           </td>
           <td class="price-container">
         <span class="price">
