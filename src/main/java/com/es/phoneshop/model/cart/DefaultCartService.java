@@ -6,6 +6,7 @@ import com.es.phoneshop.exceptions.OutOfStockException;
 import com.es.phoneshop.model.product.Product;
 import jakarta.servlet.http.HttpServletRequest;
 
+import java.util.Optional;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
 
 public class DefaultCartService implements CartService {
@@ -60,13 +61,37 @@ public class DefaultCartService implements CartService {
 
             int overallQuantity = currentItem == null ? quantity: currentItem.getQuantity() + quantity;
 
-            if (product.getStock() < overallQuantity) {
+            if (product.getStock() < overallQuantity || quantity <= 0) {
                 throw new OutOfStockException(product, quantity, product.getStock());
             }
             if (currentItem == null) {
                 cart.getItems().add(new CartItem(product, quantity));
             } else {
                 currentItem.setQuantity(overallQuantity);
+            }
+        } finally {
+            lock.writeLock().unlock();
+        }
+    }
+
+    @Override
+    public void update(Cart cart, Long productId, int quantity) throws OutOfStockException {
+        lock.writeLock().lock();
+        try{
+            CartItem currentItem = cart.getItems().stream()
+                    .filter(item -> productId.equals(item.getProduct().getId()))
+                    .findAny()
+                    .orElse(null);
+
+            Product product = productDao.getProduct(productId);
+
+            if (product.getStock() < quantity || quantity <= 0) {
+                throw new OutOfStockException(product, quantity, product.getStock());
+            }
+            if (currentItem == null) {
+                cart.getItems().add(new CartItem(product, quantity));
+            } else {
+                currentItem.setQuantity(quantity);
             }
         } finally {
             lock.writeLock().unlock();

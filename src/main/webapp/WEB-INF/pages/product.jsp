@@ -14,7 +14,7 @@
         </div>
     </c:if>
     <c:if test="${not empty error}">
-        <div class="success">
+        <div class="error">
             There was an error adding to cart
         </div>
     </c:if>

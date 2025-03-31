@@ -72,7 +72,7 @@ public class ProductDetailsPageServlet extends HttpServlet {
             quantityInt = numberFormat.parse(quantity).intValue();
         } catch (ParseException e) {
             log(e.getMessage());
-            request.setAttribute(ERROR, "not a number");
+            request.setAttribute(ERROR, "not a valid number");
             doGet(request, response);
             return;
         }
