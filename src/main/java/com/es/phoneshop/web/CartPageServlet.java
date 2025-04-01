@@ -1,9 +1,9 @@
 package com.es.phoneshop.web;
 
 import com.es.phoneshop.exceptions.OutOfStockException;
+import com.es.phoneshop.exceptions.ProductNotFoundException;
 import com.es.phoneshop.model.cart.CartService;
 import com.es.phoneshop.model.cart.DefaultCartService;
-import com.es.phoneshop.model.product.Product;
 import jakarta.servlet.ServletConfig;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServlet;
@@ -42,18 +42,30 @@ public class CartPageServlet extends HttpServlet {
         String[] quantities = request.getParameterValues(QUANTITIES);
 
         Map<Long, String> errors = new HashMap<>();
-        for (int i = 0; i < productIds.length; i++) {
-            Long productId = Long.valueOf(productIds[i]);
-            int quantityInt;
+        if (productIds != null && productIds .length != 0 && quantities != null && quantities.length != 0) {
+            for (int i = 0; i < productIds.length; i++) {
+                int quantityInt;
+                Long productId;
 
-            try {
-                NumberFormat numberFormat = NumberFormat.getInstance(request.getLocale());
-                quantityInt = numberFormat.parse(quantities[i]).intValue();
-                cartService.update(cartService.getCart(request), productId, quantityInt);
-            } catch (ParseException | OutOfStockException e) {
-                handleError(errors, productId,e);
-                log(e.getMessage());
+                try {
+                    productId = Long.valueOf(productIds[i]);
+                } catch (NumberFormatException e) {
+                    log(e.getMessage());
+                    throw e;
+                }
+
+                try {
+                    NumberFormat numberFormat = NumberFormat.getInstance(request.getLocale());
+                    quantityInt = numberFormat.parse(quantities[i]).intValue();
+                    cartService.update(cartService.getCart(request), productId, quantityInt);
+                } catch (ParseException | OutOfStockException e) {
+                    handleError(errors, productId, e);
+                    log(e.getMessage());
+                }
             }
+        } else {
+            doGet(request, response);
+            return;
         }
 
         if (errors.isEmpty()){
@@ -65,10 +77,10 @@ public class CartPageServlet extends HttpServlet {
     }
 
     private void handleError(Map<Long, String> errors, Long productId, Exception e) {
-        if (e.getClass() == ParseException.class) {
+        if (e instanceof ParseException) {
             errors.put(productId, "Not a valid number");
         } else {
-            if (e.getClass() == OutOfStockException.class) {
+            if (e instanceof OutOfStockException) {
                 errors.put(productId, "Out of stock, maximum available " + ((OutOfStockException)e).getStockAvailable());
             }
         }

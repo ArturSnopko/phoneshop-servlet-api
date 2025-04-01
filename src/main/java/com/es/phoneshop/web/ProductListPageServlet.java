@@ -6,7 +6,6 @@ import com.es.phoneshop.dao.ProductDao;
 import com.es.phoneshop.enums.SortField;
 import com.es.phoneshop.enums.SortOrder;
 import com.es.phoneshop.exceptions.OutOfStockException;
-import com.es.phoneshop.model.cart.Cart;
 import com.es.phoneshop.model.cart.CartService;
 import com.es.phoneshop.model.cart.DefaultCartService;
 import jakarta.servlet.ServletConfig;
@@ -93,10 +92,10 @@ public class ProductListPageServlet extends HttpServlet {
     }
 
     private void handleError(Map<Long, String> errors, Long productId, Exception e) {
-        if (e.getClass() == ParseException.class) {
+        if (e instanceof ParseException) {
             errors.put(productId, "Not a valid number");
         } else {
-            if (e.getClass() == OutOfStockException.class) {
+            if (e instanceof OutOfStockException) {
                 errors.put(productId, "Out of stock, maximum available " + ((OutOfStockException)e).getStockAvailable());
             }
         }

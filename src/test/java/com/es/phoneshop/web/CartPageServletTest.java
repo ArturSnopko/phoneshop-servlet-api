@@ -13,8 +13,12 @@ import org.mockito.junit.MockitoJUnitRunner;
 import java.io.IOException;
 import java.util.Locale;
 
-import static org.mockito.ArgumentMatchers.*;
-import static org.mockito.Mockito.*;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.verify;
 
 
 @RunWith(MockitoJUnitRunner.class)
@@ -34,7 +38,6 @@ public class CartPageServletTest {
     public void setup() throws ServletException {
         servlet.init(servletConfig);
         when(request.getRequestDispatcher(anyString())).thenReturn(requestDispatcher);
-        when(servletConfig.getServletContext()).thenReturn(servletContext);
         when(servletContext.getInitParameter("insertDemoData")).thenReturn("true");
 
         DemoDataServletContextListener listener = new DemoDataServletContextListener();
@@ -62,5 +65,4 @@ public class CartPageServletTest {
         verify(request).getParameterValues(eq("productId"));
         verify(response).sendRedirect(any());
     }
-
 }

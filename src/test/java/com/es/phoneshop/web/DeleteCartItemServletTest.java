@@ -1,6 +1,8 @@
 package com.es.phoneshop.web;
 
-import jakarta.servlet.*;
+import jakarta.servlet.RequestDispatcher;
+import jakarta.servlet.ServletConfig;
+import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.servlet.http.HttpSession;
@@ -11,10 +13,11 @@ import org.mockito.Mock;
 import org.mockito.junit.MockitoJUnitRunner;
 
 import java.io.IOException;
-import java.util.Locale;
 
-import static org.mockito.ArgumentMatchers.*;
-import static org.mockito.Mockito.*;
+import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.verify;
 
 
 @RunWith(MockitoJUnitRunner.class)
@@ -32,7 +35,6 @@ public class DeleteCartItemServletTest {
     @Before
     public void setup() throws ServletException {
         servlet.init(servletConfig);
-        when(request.getRequestDispatcher(anyString())).thenReturn(requestDispatcher);
     }
 
     @Test
@@ -44,5 +46,4 @@ public class DeleteCartItemServletTest {
         verify(response).sendRedirect(anyString());
         verify(request).getPathInfo();
     }
-
 }

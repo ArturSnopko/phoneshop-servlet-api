@@ -7,9 +7,7 @@ import com.es.phoneshop.model.product.Product;
 import jakarta.servlet.http.HttpServletRequest;
 
 import java.math.BigDecimal;
-import java.util.Optional;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
-import java.util.stream.Collectors;
 
 public class DefaultCartService implements CartService {
     private static class Holder {
@@ -31,16 +29,10 @@ public class DefaultCartService implements CartService {
 
     @Override
     public Cart getCart(HttpServletRequest request) {
-        lock.readLock().lock();
+        lock.writeLock().lock();
         Cart cart;
         try {
             cart = (Cart) request.getSession().getAttribute(CART_SESSION_ATTRIBUTE);
-        } finally {
-            lock.readLock().unlock();
-        }
-
-        lock.writeLock().lock();
-        try {
             if (cart == null) {
                 request.getSession().setAttribute(CART_SESSION_ATTRIBUTE, cart = new Cart());
             }

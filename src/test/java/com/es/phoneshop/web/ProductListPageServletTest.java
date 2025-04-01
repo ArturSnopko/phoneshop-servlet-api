@@ -1,6 +1,10 @@
 package com.es.phoneshop.web;
 
-import jakarta.servlet.*;
+import jakarta.servlet.RequestDispatcher;
+import jakarta.servlet.ServletConfig;
+import jakarta.servlet.ServletContext;
+import jakarta.servlet.ServletContextEvent;
+import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpSession;
 import org.junit.Before;
 import org.junit.Test;
@@ -33,7 +37,6 @@ public class ProductListPageServletTest {
     public void setup() throws ServletException {
         servlet.init(servletConfig);
         when(request.getRequestDispatcher(anyString())).thenReturn(requestDispatcher);
-        when(servletConfig.getServletContext()).thenReturn(servletContext);
         when(servletContext.getInitParameter("insertDemoData")).thenReturn("true");
 
         DemoDataServletContextListener listener = new DemoDataServletContextListener();

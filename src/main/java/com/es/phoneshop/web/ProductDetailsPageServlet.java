@@ -54,9 +54,8 @@ public class ProductDetailsPageServlet extends HttpServlet {
             request.getSession().setAttribute(RECENTLY_VISITED, recentlyVisited);
         }
 
-        if (!recentlyVisited.getItems().contains(product)) {
-            recentlyVisited.addItem(product);
-        }
+        recentlyVisited.removeItem(product);
+        recentlyVisited.addItem(product);
 
         request.setAttribute(CART, cartService.getCart(request));
         request.getRequestDispatcher("/WEB-INF/pages/product.jsp").forward(request, response);

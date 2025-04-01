@@ -2,7 +2,6 @@ package com.es.phoneshop.web;
 
 import jakarta.servlet.RequestDispatcher;
 import jakarta.servlet.ServletConfig;
-import jakarta.servlet.ServletContext;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
@@ -16,7 +15,11 @@ import org.mockito.junit.MockitoJUnitRunner;
 import java.io.IOException;
 
 import static org.mockito.ArgumentMatchers.anyString;
-import static org.mockito.Mockito.*;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.verify;
 
 
 @RunWith(MockitoJUnitRunner.class)
@@ -45,5 +48,4 @@ public class MiniCartServletTest {
         verify(requestDispatcher).include(any(),any());
         verify(request).setAttribute(eq("cart"), any());
     }
-
 }
