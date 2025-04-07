@@ -1,7 +1,7 @@
 package com.es.phoneshop.model.cart;
 
-import com.es.phoneshop.dao.MapProductDao;
-import com.es.phoneshop.dao.ProductDao;
+import com.es.phoneshop.dao.product.MapProductDao;
+import com.es.phoneshop.dao.product.ProductDao;
 import com.es.phoneshop.model.product.Product;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpSession;

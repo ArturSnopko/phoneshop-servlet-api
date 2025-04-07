@@ -1,8 +1,8 @@
 package com.es.phoneshop.web;
 
-import com.es.phoneshop.dao.MapProductDao;
+import com.es.phoneshop.dao.product.MapProductDao;
 
-import com.es.phoneshop.dao.ProductDao;
+import com.es.phoneshop.dao.product.ProductDao;
 import com.es.phoneshop.enums.SortField;
 import com.es.phoneshop.enums.SortOrder;
 import com.es.phoneshop.exceptions.OutOfStockException;
