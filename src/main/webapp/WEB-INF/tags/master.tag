@@ -23,7 +23,9 @@
       <img src="${pageContext.servletContext.contextPath}/images/logo.svg"/>
       PhoneShop
     </a>
-    <jsp:include page="/cart/minicart"/>
+    <a href = "${pageContext.servletContext.contextPath}/cart">
+      <jsp:include page="/cart/minicart"/>
+    </a>
   </header>
   <main>
     <jsp:doBody/>

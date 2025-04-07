@@ -1,7 +1,7 @@
 package com.es.phoneshop.web;
 
-import jakarta.servlet.RequestDispatcher;
 import jakarta.servlet.ServletConfig;
+import jakarta.servlet.ServletContext;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
@@ -27,11 +27,10 @@ public class DeleteCartItemServletTest {
     @Mock
     private HttpServletResponse response;
     @Mock
-    private RequestDispatcher requestDispatcher;
-    @Mock
     private ServletConfig servletConfig;
     private DeleteCartItemServlet servlet = new DeleteCartItemServlet();
-
+    @Mock
+    private ServletContext servletContext;
     @Before
     public void setup() throws ServletException {
         servlet.init(servletConfig);
@@ -42,6 +41,16 @@ public class DeleteCartItemServletTest {
         when(request.getPathInfo()).thenReturn("/1");
         HttpSession mockSession = mock(HttpSession.class);
         when(request.getSession()).thenReturn(mockSession);
+        servlet.doPost(request, response);
+        verify(response).sendRedirect(anyString());
+        verify(request).getPathInfo();
+    }
+
+    @Test (expected = IllegalArgumentException.class)
+    public void testDoPostWithInvalidId() throws IOException {
+        when(request.getPathInfo()).thenReturn("/asd");
+        when(servlet.getServletContext()).thenReturn(servletContext);
+
         servlet.doPost(request, response);
         verify(response).sendRedirect(anyString());
         verify(request).getPathInfo();

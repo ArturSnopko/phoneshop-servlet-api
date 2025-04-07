@@ -1,5 +1,6 @@
 package com.es.phoneshop.web;
 
+import com.es.phoneshop.exceptions.ProductNotFoundException;
 import jakarta.servlet.*;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
@@ -64,5 +65,29 @@ public class CartPageServletTest {
         verify(request).getParameterValues(eq("quantity"));
         verify(request).getParameterValues(eq("productId"));
         verify(response).sendRedirect(any());
+    }
+
+    @Test
+    public void testDoPostWithErrors() throws ServletException, IOException {
+        when(request.getParameterValues("quantity")).thenReturn(new String[] {"asd"});
+        when(request.getParameterValues("productId")).thenReturn(new String[] {"1"});;
+        when(request.getLocale()).thenReturn(new Locale("en"));
+        when(servlet.getServletContext()).thenReturn(servletContext);
+        HttpSession mockSession = mock(HttpSession.class);
+        when(request.getSession()).thenReturn(mockSession);
+        servlet.doPost(request, response);
+        verify(request).getParameterValues(eq("quantity"));
+        verify(request).getParameterValues(eq("productId"));
+        verify(request).setAttribute(eq("errors"), any());
+    }
+
+    @Test (expected = NumberFormatException.class)
+    public void testDoPostWithIdError() throws ServletException, IOException {
+        when(request.getParameterValues("quantity")).thenReturn(new String[] {"1"});
+        when(request.getParameterValues("productId")).thenReturn(new String[] {"asd"});;
+        when(servlet.getServletContext()).thenReturn(servletContext);
+        servlet.doPost(request, response);
+        verify(request).getParameterValues(eq("quantity"));
+        verify(request).getParameterValues(eq("productId"));
     }
 }
