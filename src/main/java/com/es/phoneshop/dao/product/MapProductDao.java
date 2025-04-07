@@ -1,5 +1,6 @@
-package com.es.phoneshop.dao;
+package com.es.phoneshop.dao.product;
 
+import com.es.phoneshop.dao.AbstractMapDao;
 import com.es.phoneshop.enums.SortField;
 import com.es.phoneshop.enums.SortOrder;
 import com.es.phoneshop.exceptions.ProductNotFoundException;
@@ -9,15 +10,10 @@ import org.eclipse.jetty.util.StringUtil;
 import java.util.Arrays;
 import java.util.Comparator;
 import java.util.HashMap;
-import java.util.Map;
 import java.util.List;
-import java.util.concurrent.atomic.AtomicLong;
-import java.util.concurrent.locks.ReentrantReadWriteLock;
 
 
-public class MapProductDao implements ProductDao {
-    private static volatile ProductDao instance;
-
+public class MapProductDao extends AbstractMapDao<Long, Product, ProductNotFoundException> implements ProductDao {
     private static class Holder {
         private static final MapProductDao INSTANCE = new MapProductDao();
     }
@@ -26,27 +22,15 @@ public class MapProductDao implements ProductDao {
         return Holder.INSTANCE;
     }
 
-
-    private final Map<Long, Product> productMap;
-    private final AtomicLong currentId;
-    private final ReentrantReadWriteLock lock = new ReentrantReadWriteLock();
+    private static final String PRODUCT_NOT_FOUND = "Product wasn't found, id:";
 
     private MapProductDao() {
-        productMap = new HashMap<Long, Product>();
-        currentId =  new AtomicLong(1);
+        super(new HashMap<>(),PRODUCT_NOT_FOUND);
     }
 
     @Override
     public Product getProduct(Long id) throws ProductNotFoundException {
-        lock.readLock().lock();
-        try {
-            Product res = productMap.get(id);
-            if (res == null)
-                throw  new ProductNotFoundException("Product with id = " + id + " wasn't found", id);
-            return res;
-        } finally {
-            lock.readLock().unlock();
-        }
+        return super.get(id);
     }
 
     @Override
@@ -71,7 +55,7 @@ public class MapProductDao implements ProductDao {
 
             Comparator <Product> finalComparator = sortField == null ? searchComparator : productComparator.thenComparing(searchComparator);
 
-            return productMap.values().stream()
+            return dataMap.values().stream()
                     .filter(product -> filter(splitQuery, product))
                     .sorted(finalComparator)
                     .toList();
@@ -87,7 +71,7 @@ public class MapProductDao implements ProductDao {
             if (product.getId() == null) {
                 product.setId(currentId.getAndAdd(1));
             }
-            productMap.put(product.getId(), product);
+            dataMap.put(product.getId(), product);
         } finally {
             lock.writeLock().unlock();
         }
@@ -98,7 +82,7 @@ public class MapProductDao implements ProductDao {
     public void delete(Long id) throws ProductNotFoundException {
         lock.writeLock().lock();
         try {
-            if (productMap.remove(id) == null) {
+            if (dataMap.remove(id) == null) {
                 throw new ProductNotFoundException("Product with id = " + id + " wasn't found", id);
             }
         } finally {
@@ -107,12 +91,7 @@ public class MapProductDao implements ProductDao {
     }
 
     public void clear(){
-        lock.writeLock().lock();
-        try {
-            productMap.clear();
-        } finally {
-            lock.writeLock().unlock();
-        }
+        super.clear();
     }
 
     private boolean filter (List<String> splitQuery, Product product){
@@ -120,4 +99,10 @@ public class MapProductDao implements ProductDao {
                splitQuery.stream().anyMatch(part -> product.getDescription().contains(part))) &&
                product.getStock() > 0 && product.getPrice() != null);
     }
+
+    @Override
+    protected ProductNotFoundException getException(String mes, Long key) throws ProductNotFoundException {
+        return new ProductNotFoundException(mes,key);
+    }
+
 }

@@ -3,7 +3,5 @@
 <%@ taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt" %>
 <%@ taglib prefix="tags" tagdir="/WEB-INF/tags" %>
 
-<tags:master pageTitle="Product List">
-  <h1>Product with id = ${pageContext.exception.id} not found</h1>
-  <p>${pageContext.exception}</p>
-</tags:master>
+<jsp:useBean id="cart" type="com.es.phoneshop.model.cart.Cart" scope="request"/>
+Cart:${cart.totalQuantity} items

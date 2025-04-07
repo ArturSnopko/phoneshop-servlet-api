@@ -2,6 +2,15 @@
 <%@ attribute name="pageTitle" required="true" %>
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
 
+<script>
+  history.scrollRestoration = "manual";
+  window.onpageshow = function(event) {
+    if (event.persisted) {
+      location.reload();
+    }
+  };
+</script>
+
 <html>
 <head>
   <title>${pageTitle}</title>
@@ -14,6 +23,9 @@
       <img src="${pageContext.servletContext.contextPath}/images/logo.svg"/>
       PhoneShop
     </a>
+    <a href = "${pageContext.servletContext.contextPath}/cart">
+      <jsp:include page="/cart/minicart"/>
+    </a>
   </header>
   <main>
     <jsp:doBody/>
@@ -23,7 +35,6 @@
     <c:set var="recentlyVisitedList" value="${sessionScope.recentlyVisited.items.reversed()}" />
     <tr>
       <c:forEach var="pr" items="${recentlyVisitedList}">
-        ${pr}
         <td>
             <img src="${pr.imageUrl}">
             <p>

@@ -1,8 +1,8 @@
 package com.es.phoneshop.web;
 
 import com.es.phoneshop.model.cart.Cart;
-import com.es.phoneshop.dao.MapProductDao;
-import com.es.phoneshop.dao.ProductDao;
+import com.es.phoneshop.dao.product.MapProductDao;
+import com.es.phoneshop.dao.product.ProductDao;
 import com.es.phoneshop.exceptions.OutOfStockException;
 import com.es.phoneshop.exceptions.ProductNotFoundException;
 import com.es.phoneshop.model.cart.CartService;
@@ -54,9 +54,8 @@ public class ProductDetailsPageServlet extends HttpServlet {
             request.getSession().setAttribute(RECENTLY_VISITED, recentlyVisited);
         }
 
-        if (!recentlyVisited.getItems().contains(product)) {
-            recentlyVisited.addItem(product);
-        }
+        recentlyVisited.removeItem(product);
+        recentlyVisited.addItem(product);
 
         request.setAttribute(CART, cartService.getCart(request));
         request.getRequestDispatcher("/WEB-INF/pages/product.jsp").forward(request, response);
@@ -72,7 +71,7 @@ public class ProductDetailsPageServlet extends HttpServlet {
             quantityInt = numberFormat.parse(quantity).intValue();
         } catch (ParseException e) {
             log(e.getMessage());
-            request.setAttribute(ERROR, "not a number");
+            request.setAttribute(ERROR, "not a valid number");
             doGet(request, response);
             return;
         }
