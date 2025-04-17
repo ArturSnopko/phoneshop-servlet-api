@@ -1,7 +1,7 @@
 package com.es.phoneshop.model.cart;
 
-import com.es.phoneshop.dao.MapProductDao;
-import com.es.phoneshop.dao.ProductDao;
+import com.es.phoneshop.dao.product.MapProductDao;
+import com.es.phoneshop.dao.product.ProductDao;
 import com.es.phoneshop.exceptions.OutOfStockException;
 import com.es.phoneshop.model.product.Product;
 import jakarta.servlet.http.HttpServletRequest;
@@ -46,25 +46,7 @@ public class DefaultCartService implements CartService {
     public void add(Cart cart, Long productId, int quantity) throws OutOfStockException {
         lock.writeLock().lock();
         try{
-            CartItem currentItem = cart.getItems().stream()
-                    .filter(item -> productId.equals(item.getProduct().getId()))
-                    .findAny()
-                    .orElse(null);
-
-            Product product = productDao.getProduct(productId);
-
-            int overallQuantity = currentItem == null ? quantity: currentItem.getQuantity() + quantity;
-
-            if (product.getStock() < overallQuantity || quantity <= 0) {
-                throw new OutOfStockException(product, quantity, product.getStock());
-            }
-            if (currentItem == null) {
-                cart.getItems().add(new CartItem(product, quantity));
-            } else {
-                currentItem.setQuantity(overallQuantity);
-            }
-
-            recalculateCart(cart);
+          addIntoCart(cart, productId, quantity, false);
         } finally {
             lock.writeLock().unlock();
         }
@@ -74,23 +56,7 @@ public class DefaultCartService implements CartService {
     public void update(Cart cart, Long productId, int quantity) throws OutOfStockException {
         lock.writeLock().lock();
         try{
-            CartItem currentItem = cart.getItems().stream()
-                    .filter(item -> productId.equals(item.getProduct().getId()))
-                    .findAny()
-                    .orElse(null);
-
-            Product product = productDao.getProduct(productId);
-
-            if (product.getStock() < quantity || quantity <= 0) {
-                throw new OutOfStockException(product, quantity, product.getStock());
-            }
-            if (currentItem == null) {
-                cart.getItems().add(new CartItem(product, quantity));
-            } else {
-                currentItem.setQuantity(quantity);
-            }
-
-            recalculateCart(cart);
+            addIntoCart(cart, productId, quantity, true);
         } finally {
             lock.writeLock().unlock();
         }
@@ -111,7 +77,7 @@ public class DefaultCartService implements CartService {
     private void recalculateCart(Cart cart) {
         cart.setTotalQuantity(cart.getItems().stream()
                 .map(CartItem::getQuantity)
-                .mapToInt(q -> q.intValue())
+                .mapToInt(q -> q)
                 .sum());
         cart.setTotalCost(cart.getItems().stream()
                 .map(item -> item.getProduct().
@@ -119,5 +85,32 @@ public class DefaultCartService implements CartService {
                         multiply(BigDecimal.valueOf(item.getQuantity())))
                 .reduce(BigDecimal.ZERO, BigDecimal::add)
         );
+    }
+
+    private void addIntoCart(Cart cart, Long productId, int quantity, boolean update) {
+        CartItem currentItem = cart.getItems().stream()
+                .filter(item -> productId.equals(item.getProduct().getId()))
+                .findAny()
+                .orElse(null);
+
+        Product product = productDao.getProduct(productId);
+        int overallQuantity;
+
+        if (update) {
+            overallQuantity = quantity;
+        } else {
+            overallQuantity = currentItem == null ? quantity: currentItem.getQuantity() + quantity;
+        }
+
+        if (product.getStock() < overallQuantity || quantity <= 0) {
+            throw new OutOfStockException(product, quantity, product.getStock());
+        }
+        if (currentItem == null) {
+            cart.getItems().add(new CartItem(product, quantity));
+        } else {
+            currentItem.setQuantity(overallQuantity);
+        }
+
+        recalculateCart(cart);
     }
 }

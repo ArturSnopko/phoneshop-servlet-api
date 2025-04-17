@@ -6,7 +6,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class Cart implements Serializable {
-    private final List<CartItem> items;
+    private List<CartItem> items;
 
     private int totalQuantity;
     private BigDecimal totalCost;
@@ -38,5 +38,13 @@ public class Cart implements Serializable {
 
     public void setTotalQuantity(int totalQuantity) {
         this.totalQuantity = totalQuantity;
+    }
+
+    public void setItems(List<CartItem> items) {
+        this.items = items;
+    }
+
+    public void clear(){
+        items.clear();
     }
 }
