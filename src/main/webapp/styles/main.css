@@ -37,7 +37,18 @@ img.product-tile {
   color:green;
 }
 
+.search{
+  display: flex;
+  flex-direction: column;
+}
+
+.buttonSearch{
+  width: 250px;
+}
+
+
 /* Page specific styles */
 body.product-list {
 
 }
+

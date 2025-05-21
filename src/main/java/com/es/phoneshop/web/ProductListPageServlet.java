@@ -8,6 +8,7 @@ import com.es.phoneshop.enums.SortOrder;
 import com.es.phoneshop.exceptions.OutOfStockException;
 import com.es.phoneshop.model.cart.CartService;
 import com.es.phoneshop.model.cart.DefaultCartService;
+import com.es.phoneshop.model.product.AdditionalParams;
 import jakarta.servlet.ServletConfig;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServlet;
@@ -27,11 +28,16 @@ public class ProductListPageServlet extends HttpServlet {
     private CartService cartService;
 
     private static final String QUERY = "query";
+    private static final String MIN_PRICE = "minPrice";
+    private static final String MAX_PRICE = "maxPrice";
+    private static final String SEARCH_QUERY_OPTIONS = "searchQueryOptions";
+
     private static final String SORT = "sort";
     private static final String SORT_ORDER = "order";
     private static final String PRODUCT_ID = "productId";
     private static final String QUANTITY = "quantity";
     private static final String ERRORS = "errors";
+    private static final String ERRORS_QUERY = "errorsQuery";
 
     @Override
     public void init(ServletConfig config) throws ServletException {
@@ -43,15 +49,49 @@ public class ProductListPageServlet extends HttpServlet {
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
         String query = request.getParameter(QUERY);
+        AdditionalParams additionalParams = new AdditionalParams();
+
+        Map<String, String> errors = new HashMap<>();
+
+        String queryOptions = request.getParameter(SEARCH_QUERY_OPTIONS);
+
+        String minPrice = request.getParameter(MIN_PRICE);
+        try {
+            NumberFormat numberFormat = NumberFormat.getInstance(request.getLocale());
+            numberFormat.parse(minPrice).intValue();
+        }  catch (ParseException e) {
+            errors.put("minPrice", "not a number");
+            minPrice = null;
+        }
+
+        String maxPrice = request.getParameter(MAX_PRICE);
+        try {
+            NumberFormat numberFormat = NumberFormat.getInstance(request.getLocale());
+            numberFormat.parse(maxPrice).intValue();
+        }  catch (ParseException e) {
+            errors.put("maxPrice", "not a number");
+            maxPrice = null;
+        }
+
+        if (queryOptions != null) additionalParams.QueryParam = queryOptions.substring(0, 3);
+        additionalParams.MinPrice = minPrice;
+        additionalParams.MaxPrice = maxPrice;
 
         String sortField = request.getParameter(SORT);
         String sortOrder = request.getParameter(SORT_ORDER);
 
+        request.setAttribute(SEARCH_QUERY_OPTIONS, cartService.getSearchOptions());
         request.setAttribute("products", productDao.findProducts(query,
                 Optional.ofNullable(sortField).map(String::toUpperCase).map(SortField::valueOf).orElse(null),
-                Optional.ofNullable(sortOrder).map(String::toUpperCase).map(SortOrder::valueOf).orElse(null)
+                Optional.ofNullable(sortOrder).map(String::toUpperCase).map(SortOrder::valueOf).orElse(null),
+                additionalParams
         ));
-        request.getRequestDispatcher("/WEB-INF/pages/productList.jsp").forward(request, response);
+
+        if (!errors.isEmpty()){
+            request.setAttribute(ERRORS_QUERY, errors);
+        }
+            request.getRequestDispatcher("/WEB-INF/pages/productList.jsp").forward(request, response);
+
     }
 
     @Override
@@ -71,6 +111,7 @@ public class ProductListPageServlet extends HttpServlet {
             handleError(errors, productIdInt, e);
         }
 
+        request.setAttribute(SEARCH_QUERY_OPTIONS, cartService.getSearchOptions());
         if (errors.isEmpty()){
             response.sendRedirect(request.getContextPath() + "/products?message= Added to cart successfully");
         } else {

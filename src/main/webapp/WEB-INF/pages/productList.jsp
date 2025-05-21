@@ -21,12 +21,44 @@
       There were errors
     </div>
   </c:if>
-  <form>
+  <c:if test="${not empty errorsQuery}">
+    <div class="error">
+      There were errors
+    </div>
+  </c:if>
+
+  <h3> Advanced Search</h3>
+  <form class="search" style="  display: flex; gap: 10px; flex-direction: column;">
     <label>
+      Description:
       <input name = "query" value = "${param.query}">
-      <button>Search</button>
+      <select name="searchQueryOptions">
+        <c:forEach var = "option" items ="${searchQueryOptions}">
+        <option>${option} words</option>
+       </c:forEach>
+      </select>
     </label>
+    <label>
+      Min price:
+      <input name="minPrice" value = "${param.minPrice}">
+      <c:if  test="${not empty errorsQuery}">
+        <div class="error">
+            ${errorsQuery["minPrice"]}
+        </div>
+      </c:if>
+    </label>
+    <label>
+      Max price:
+      <input name="maxPrice" value = "${param.maxPrice}">
+      <c:if  test="${not empty errorsQuery}">
+        <div class="error">
+            ${errorsQuery["maxPrice"]}
+        </div>
+      </c:if>
+    </label>
+    <button class="buttonSearch" style="width: 150px">Search</button>
   </form>
+
   <table>
     <thead>
       <tr>

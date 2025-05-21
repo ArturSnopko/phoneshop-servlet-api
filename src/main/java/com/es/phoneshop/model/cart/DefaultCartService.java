@@ -2,12 +2,16 @@ package com.es.phoneshop.model.cart;
 
 import com.es.phoneshop.dao.product.MapProductDao;
 import com.es.phoneshop.dao.product.ProductDao;
+import com.es.phoneshop.enums.SearchQueryOptions;
 import com.es.phoneshop.exceptions.OutOfStockException;
 import com.es.phoneshop.model.product.Product;
 import jakarta.servlet.http.HttpServletRequest;
 
 import java.math.BigDecimal;
+import java.util.Arrays;
+import java.util.List;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
+import java.util.stream.Collectors;
 
 public class DefaultCartService implements CartService {
     private static class Holder {
@@ -72,6 +76,14 @@ public class DefaultCartService implements CartService {
         } finally {
             lock.writeLock().unlock();
         }
+    }
+
+    @Override
+    public List<String> getSearchOptions() {
+        return Arrays.stream(SearchQueryOptions.values())
+                .map(Enum::name)
+                .map(String::toLowerCase)
+                .collect(Collectors.toList());
     }
 
     private void recalculateCart(Cart cart) {
